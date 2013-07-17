@@ -98,6 +98,31 @@ describe 'SingletonServer', ->
           spy.fs.unlink.should.have.been.calledWith \./server.sock
           done!
 
+  describe 'if unknown server error occurs', ->
+    should "emit 'error' event", (done) ->
+        triggerError = catchCallback spy.server, \on, \error
+        server = new @SingletonServer
+        dummyError = { code: \BORKBORKBORK }
+        server.on \error, (error) ->
+          error.should.equal dummyError
+          done!
+        triggerError dummyError
+
+
+  describe '#close()', ->
+    should 'end the client connection, if it exists', ->
+      incomingConnection = catchCallback spy.server, \on, \connection
+      ss = new @SingletonServer
+      incomingConnection spy.socket
+      ss.close!
+      spy.socket.end.should.have.been.calledOnce
+
+    should 'close the server', ->
+      ss = new @SingletonServer
+      ss.close!
+      spy.server.close.should.have.been.calledOnce
+
+
   beforeEach ->
     [s.reset! for i, s of spy when s.reset?]
     [s.resetBehavior! for i, s of spy when s.resetBehavior?]
@@ -106,6 +131,7 @@ describe 'SingletonServer', ->
     spy.server.listen = sinon.spy!
     spy.server.emit = sinon.spy!
     spy.server.on = sinon.spy!
+    spy.server.close = sinon.spy!
     spy.socket.emit = sinon.spy!
     spy.socket.end = sinon.spy!
     spy.socket.on = sinon.spy!

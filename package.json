@@ -1,7 +1,7 @@
 {
   "name": "dircc",
   "version": "0.0.0",
-  "description": "Decoupleable IRC connection library.",
+  "description": "Detachable, persistent IRC connection.",
   "main": "index.js",
   "directories": {
     "test": "test",

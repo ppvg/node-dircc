@@ -2,11 +2,13 @@
 
 [![Build Status](https://drone.io/github.com/PPvG/node-dircc/status.png)](https://drone.io/github.com/PPvG/node-dircc/latest) [![Code Coverage](https://drone.io/github.com/PPvG/node-dircc/files/coverage.png)](https://drone.io/github.com/PPvG/node-dircc/files/coverage.html)
 
-Detached, persistent connection to an IRC server.
+Detachable, persistent IRC connection.
 
 The actual connection to the server runs in a detached process, making it possible to reload your IRC client without breaking the connection to the server.
 
-It uses an [ircc][ircc] `Connection` internally, which only handles the connection, not the communication. It doesn't respond to `PING`s, doesn't send `NICK` and `USER` at the start of the session, et cetera.
+It uses an [ircc `Connection`][ircc] internally, which only handles the connection, not the communication. It doesn't respond to `PING`s, doesn't send `NICK` and `USER` at the start of the session, et cetera.
+
+  [ircc]: https://npmjs.org/package/ircc
 
 #### Example
 
@@ -40,7 +42,6 @@ It uses an [ircc][ircc] `Connection` internally, which only handles the connecti
 - [ircc][ircc]
 - [dnode][dnode]
 
-  [ircc]: https://npmjs.org/package/ircc
   [dnode]: https://github.com/substack/dnode
 
 
@@ -106,7 +107,7 @@ Emitted when connected to a ConnectionServer that doesn't have a `Connection` to
 
 ### dircc.ConnectionServer
 
-Manages a `Connection` and offers an API to communicate with it via a unix socket (using dnode).
+Manages a `Connection` and offers an API to communicate with it via a unix socket (using [dnode][dnode]).
 
     var server = new ircc.ConnectionServer();
 
