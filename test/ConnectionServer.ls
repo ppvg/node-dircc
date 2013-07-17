@@ -1,10 +1,10 @@
 should = it
-pathToModule = modulePath \connection, \PersistentConnectionServer
+pathToModule = modulePath \ConnectionServer
 
-describe 'PersistentConnectionServer', ->
+describe 'ConnectionServer', ->
 
   should 'create SingletonServer', ->
-    pcs = new @PersistentConnectionServer
+    pcs = new @ConnectionServer
     spy.SingletonServer.should.have.been.calledOnce
     spy.SingletonServer.should.have.been.calledWithNew
     pcs.server.should.equal spy.server
@@ -12,7 +12,7 @@ describe 'PersistentConnectionServer', ->
   shouldForward = (event) ->
     (done) ->
       callback = catchCallback spy.server, \on, event
-      pcs = new @PersistentConnectionServer
+      pcs = new @ConnectionServer
       pcs.on event, done
       callback!
 
@@ -23,21 +23,21 @@ describe 'PersistentConnectionServer', ->
 
   should "forward 'listening' events", (done) ->
     listening = catchCallback spy.server, \on, \listening
-    pcs = new @PersistentConnectionServer
+    pcs = new @ConnectionServer
     pcs.on \listening, done
     listening!
 
   describe 'when a client connects', ->
     should 'expose API via dnode', ->
       triggerConnection = catchCallback spy.server, \on, \connection
-      pcs = new @PersistentConnectionServer
+      pcs = new @ConnectionServer
       triggerConnection spy.socket
       spy.dnode.args[0][0].should.be.an.object
       spy.dnode.args[0][0].should.have.keys <[connect close send]>
 
     should 'pipe dnode object to socket', ->
       triggerConnection = catchCallback spy.server, \on, \connection
-      pcs = new @PersistentConnectionServer
+      pcs = new @ConnectionServer
       triggerConnection spy.socket
       spy.socket.pipe.should.have.been.calledOnce
       spy.socket.pipe.should.have.been.calledWith spy.d
@@ -46,7 +46,7 @@ describe 'PersistentConnectionServer', ->
 
   describe '#listen()', ->
     should 'start the server', ->
-      pcs = new @PersistentConnectionServer
+      pcs = new @ConnectionServer
       pcs.listen \ircc.sock
       spy.server.listen.should.have.been.calledOnce
       spy.server.listen.should.have.been.calledWith \ircc.sock
@@ -54,7 +54,7 @@ describe 'PersistentConnectionServer', ->
   describe '#connect()', ->
     should 'create Connection unless it already exists', ->
       triggerConnection = catchCallback spy.server, \on, \connection
-      pcs = new @PersistentConnectionServer
+      pcs = new @ConnectionServer
       triggerConnection spy.socket
       spy.dnode.args[0][0].connect 6667, \irc.example.com
       spy.Connection.should.have.been.calledOnce
@@ -64,7 +64,7 @@ describe 'PersistentConnectionServer', ->
 
     should 'not create Connection if it already exists', ->
       triggerConnection = catchCallback spy.server, \on, \connection
-      pcs = new @PersistentConnectionServer
+      pcs = new @ConnectionServer
       expect pcs.connection .to.be.null
       triggerConnection spy.socket
       spy.dnode.args[0][0].connect!
@@ -78,7 +78,7 @@ describe 'PersistentConnectionServer', ->
       triggerConnection = catchCallback spy.server, \on, \connection
       triggerMessage = catchCallback spy.connection, \on, \message
       dummyMessage = { command: \WELCOME }
-      pcs = new @PersistentConnectionServer
+      pcs = new @ConnectionServer
       pcs.on \message, (message) ->
         message.should.equal dummyMessage
         done!
@@ -90,7 +90,7 @@ describe 'PersistentConnectionServer', ->
       triggerConnection = catchCallback spy.server, \on, \connection
       triggerConnected = catchCallback spy.connection, \on, \connect
       spy.d.on.yields spy.remote
-      pcs = new @PersistentConnectionServer
+      pcs = new @ConnectionServer
       pcs.on \connect, done
       triggerConnection spy.socket
       spy.dnode.args[0][0].connect 6667, \irc.example.com
@@ -99,7 +99,7 @@ describe 'PersistentConnectionServer', ->
   describe '#send()', ->
     should 'proxy to connection.send()', ->
       triggerConnection = catchCallback spy.server, \on, \connection
-      pcs = new @PersistentConnectionServer
+      pcs = new @ConnectionServer
       pcs.connect 6667, \irc.example.com
       pcs.send \one, \two, 3
       spy.connection.send.should.have.been.calledOnce
@@ -107,35 +107,35 @@ describe 'PersistentConnectionServer', ->
 
     should 'fail silently if connection is not open', ->
       triggerConnection = catchCallback spy.server, \on, \connection
-      pcs = new @PersistentConnectionServer
+      pcs = new @ConnectionServer
       (-> pcs.send \one, \two, 3).should.not.throw!
       spy.connection.send.should.not.have.been.called
 
   describe '#close()', ->
     should 'close the Connection', ->
       triggerConnection = catchCallback spy.server, \on, \connection
-      pcs = new @PersistentConnectionServer
+      pcs = new @ConnectionServer
       pcs.connect 6667, \irc.example.com
       pcs.close!
       spy.connection.close.should.have.been.calledOnce
 
     should 'stop accepting client connections', ->
       triggerConnection = catchCallback spy.server, \on, \connection
-      pcs = new @PersistentConnectionServer
+      pcs = new @ConnectionServer
       pcs.connect 6667, \irc.example.com
       pcs.close!
       spy.server.close.should.have.been.calledOnce
 
     should 'close gracefully even if connection is not open', ->
       triggerConnection = catchCallback spy.server, \on, \connection
-      pcs = new @PersistentConnectionServer
+      pcs = new @ConnectionServer
       pcs.close!
       spy.server.close.should.have.been.calledOnce
 
   describe 'client-server API', ->
     shouldProxy = (method) ->
       triggerConnection = catchCallback spy.server, \on, \connection
-      pcs = new @PersistentConnectionServer
+      pcs = new @ConnectionServer
       pcs[method] = sinon.spy!
       triggerConnection spy.socket
       dummyArg = {}
@@ -155,7 +155,7 @@ describe 'PersistentConnectionServer', ->
     should 'send incoming messages to the client', ->
       triggerConnection = catchCallback spy.server, \on, \connection
       spy.d.on.yields spy.remote
-      pcs = new @PersistentConnectionServer
+      pcs = new @ConnectionServer
       incomingMessage = catchCallback pcs, \on, \message
       triggerConnection spy.socket
       dummyMessage = { command: \WELCOME }
@@ -166,7 +166,7 @@ describe 'PersistentConnectionServer', ->
     should "inform client of 'connect' events", (done) ->
       triggerConnection = catchCallback spy.server, \on, \connection
       spy.d.on.yields spy.remote
-      pcs = new @PersistentConnectionServer
+      pcs = new @ConnectionServer
       pcs.on \connect, ->
         setImmediate ->
           spy.remote.connect.should.have.been.calledOnce
@@ -177,7 +177,7 @@ describe 'PersistentConnectionServer', ->
     should "call 'connect' on client when connection already existed", ->
       triggerConnection = catchCallback spy.server, \on, \connection
       spy.d.on.yields spy.remote
-      pcs = new @PersistentConnectionServer
+      pcs = new @ConnectionServer
       pcs.connection = spy.connection
       triggerConnection spy.socket
       spy.remote.connect.should.have.been.calledOnce
@@ -185,14 +185,14 @@ describe 'PersistentConnectionServer', ->
     should "call 'init' on client if not already connected", ->
       triggerConnection = catchCallback spy.server, \on, \connection
       spy.d.on.yields spy.remote
-      pcs = new @PersistentConnectionServer
+      pcs = new @ConnectionServer
       triggerConnection spy.socket
       spy.remote.init.should.have.been.calledOnce
 
     should "not call 'init' on client if already connected", ->
       triggerConnection = catchCallback spy.server, \on, \connection
       spy.d.on.yields spy.remote
-      pcs = new @PersistentConnectionServer
+      pcs = new @ConnectionServer
       pcs.connection = spy.connection
       triggerConnection spy.socket
       spy.remote.init.should.not.have.been.called
@@ -222,9 +222,9 @@ describe 'PersistentConnectionServer', ->
     mockery.enable!
     mockery.registerAllowables [\events, pathToModule], true
     mockery.registerMock \dnode, spy.dnode
-    mockery.registerMock \./Connection, spy.Connection
+    mockery.registerMock \ircc, { Connection: spy.Connection }
     mockery.registerMock \./SingletonServer, spy.SingletonServer
-    @PersistentConnectionServer = require pathToModule
+    @ConnectionServer = require pathToModule
 
   after ->
     mockery.deregisterAll!

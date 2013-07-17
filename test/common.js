@@ -5,7 +5,7 @@ global.chai.use(require('sinon-chai'));
 global.expect = chai.expect;
 chai.should()
 global.mockery = require('mockery');
-global.libPath = process.env.IRCC_COV
+global.libPath = process.env.DIRCC_COV
   ? path.join(__dirname, '..', 'lib-cov')
   : path.join(__dirname, '..', 'lib');
 global.modulePath = function() {

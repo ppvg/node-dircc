@@ -1,5 +1,5 @@
 should = it
-pathToModule = modulePath \connection, \SingletonServer
+pathToModule = modulePath \SingletonServer
 
 describe 'SingletonServer', ->
 

@@ -2,13 +2,13 @@ require! net
 require! path
 require! events
 {spawn} = require \child_process
-require! \./PersistentConnectionServer
-require! \./PersistentConnectionClient
+require! \./ConnectionServer
+require! \./ConnectionClient
 
 calledDirectly = module is require.main
 
 if not calledDirectly
-  module.exports = createPersistentConnection = (filename) ->
+  module.exports = createConnection = (filename, callback) ->
     ee = new events.EventEmitter
     filename = path.resolve (filename || \ircc.sock)
     server = spawn \node, [module.filename, filename], { detached: true }
@@ -19,8 +19,9 @@ if not calledDirectly
       ready = data is \listening or data is \superfluous
       if ready
         socket = net.createConnection filename
-        client = new PersistentConnectionClient socket
+        client = new ConnectionClient socket
         ee.emit \client, client
+        if typeof callback is \function then callback client
       else
         ee.emit \error, new Error "Unexpected server output: #{data}"
 
@@ -30,7 +31,7 @@ if not calledDirectly
     ee
 
 else
-  server = new PersistentConnectionServer
+  server = new ConnectionServer
   server.on \listening, ->
     process.stdout.write \listening
   server.on \superfluous, ->

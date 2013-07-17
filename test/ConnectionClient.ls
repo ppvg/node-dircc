@@ -1,7 +1,7 @@
 should = it
-pathToModule = modulePath \connection, \PersistentConnectionClient
+pathToModule = modulePath \ConnectionClient
 
-describe 'PersistentConnectionClient', ->
+describe 'ConnectionClient', ->
 
   describe 'callback API', ->
     should "expose callbacks via dnode", ->

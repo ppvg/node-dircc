@@ -4,4 +4,4 @@ coverage.*
 lib/
 lib-cov/
 node_modules/
-ircc-*.tgz
+dircc-*.tgz

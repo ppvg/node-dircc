@@ -1,7 +1,7 @@
 require! dnode
 require! events
 
-module.exports = class PersistentConnectionClient extends events.EventEmitter
+module.exports = class ConnectionClient extends events.EventEmitter
   (socket) ~>
     remote = null
 

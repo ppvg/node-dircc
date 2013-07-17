@@ -1,9 +1,9 @@
-require! \dnode
-require! \events
-require! \./Connection
+require! dnode
+require! events
+require! ircc
 require! \./SingletonServer
 
-module.exports = class PersistentConnectionServer extends events.EventEmitter
+module.exports = class ConnectionServer extends events.EventEmitter
   ~>
     @server = new SingletonServer
     @server.on \connection, @_onClientConnection
@@ -18,7 +18,7 @@ module.exports = class PersistentConnectionServer extends events.EventEmitter
 
   connect: (port, host) ~>
     if not @connection?
-      @connection = new Connection
+      @connection = new ircc.Connection
       @connection.connect port, host
       @connection.on \message, (message) ~>
         @emit \message, message
